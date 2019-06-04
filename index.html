@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <style>
+      #navMenu {
+        display:flex;
+        justify-content: space-around;
+      }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src='https://unpkg.com/babel-standalone@6/babel.min.js'></script>
+    <script src='https://unpkg.com/react@16/umd/react.development.js' crossorigin=""></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin=""></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js'></script>
+    <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' />
+  </head>
+  <body>
+    <div id='root' class='container'>
+    <script type ='text/babel'>
+      const { HashRouter, Route, NavLink, Link } = ReactRouterDOM;
+//App componenet to track state and route UI
+      class App extends React.Component {
+        constructor () {
+          super()
+          this.state = {
+            people:[]
+          }
+        };
+      async componentDidMount() {
+        try {
+          const reply = await fetch ('https://swapi.co/api/people/')
+          const data = await reply.json()
+          console.log(data)
+        } catch(err) {
+          console.log('Error')
+        };
+      };
+      render() {
+        return (
+          <HashRouter>
+            <h2> Star Wars CRD </h2>
+            <hr />
+            <Route path='/' component= {NavMenu} />
+            <hr />
+            <Route path='/people' component= {People} />
+            <Route path='/createPerson' component= {CreatePerson} />
+          </HashRouter>
+        )
+      }
+
+      };
+
+// Navigation component to change between views
+      class NavMenu extends React.Component {
+        render() {
+          return (
+            <div id='navMenu'>
+              <NavLink to='/'> Home </NavLink>
+              <NavLink to='/people'> People </NavLink>
+              <NavLink to='/createPerson'> Create A Person </NavLink>
+            </div>
+          )
+        };
+      };
+
+// People component list people in state
+      class People extends React.Component {
+        constructor () {
+          super()
+          this.state = {
+            people: [{
+              "name": "Obi-Wan Kenobi",
+            }],
+            loading: true,
+            hash: 0
+          };
+        };
+        async getPeople() {
+          const reply = await fetch ('https://swapi.co/api/people/')
+          const people = await reply.json()
+          return people
+        };
+        async componentDidMount() {
+          try {
+            const people = await this.getPeople()
+            this.setState({
+              people: people.results,
+              loading: false})
+          } catch (err) {
+            console.error(err)
+          }
+        };
+        render () {
+          console.log(this.state)
+          if (this.state.loading) {
+          return <div>Not Loaded</div>;
+          }
+          return (
+            <div id="peopleBox">
+              <h3> Galaxy Directory </h3>
+                <ul>
+                  {this.state.people && this.state.people.map((person,idx) => {
+                     return (
+                      <li key={idx} className='person' onClick={() => this.displayPerson(person.url)}>
+                        {person.name}
+                     </li>
+                     )}
+                  )}
+                </ul>
+            </div>
+          )
+        };
+      };
+
+      class CreatePerson extends React.Component {
+
+      }
+
+      ReactDOM.render(
+          <App/>,
+        document.getElementById('root')
+      )
+
+    </script>
+    </div>
+  </body>
+</html>
