@@ -17,36 +17,40 @@
     <div id='root' class='container'>
     <script type ='text/babel'>
       const { HashRouter, Route, NavLink, Link } = ReactRouterDOM;
+
 //App componenet to track state and route UI
       class App extends React.Component {
         constructor () {
           super()
           this.state = {
-            people:[]
+            people:[],
+            loading: true,
           }
         };
-      async componentDidMount() {
-        try {
-          const reply = await fetch ('https://swapi.co/api/people/')
-          const data = await reply.json()
-          console.log(data)
-        } catch(err) {
-          console.log('Error')
+        async componentDidMount() {
+          try {
+            const reply = await fetch ('https://swapi.co/api/people/')
+            const data = await reply.json()
+            this.setState({
+              people: data.results,
+              loading: false
+            })
+          } catch(err) {
+            console.log('Error')
+          };
         };
-      };
-      render() {
-        return (
-          <HashRouter>
-            <h2> Star Wars CRD </h2>
-            <hr />
-            <Route path='/' component= {NavMenu} />
-            <hr />
-            <Route path='/people' component= {People} />
-            <Route path='/createPerson' component= {CreatePerson} />
-          </HashRouter>
-        )
-      }
-
+        render() {
+          return (
+            <HashRouter>
+              <h2> Star Wars CRD </h2>
+              <hr />
+              <Route path='/' component= {NavMenu} />
+              <hr />
+              <Route path='/people' component= {People} people={this.state.people}/>
+              <Route path='/createPerson' component= {CreatePerson} />
+            </HashRouter>
+          )
+        };
       };
 
 // Navigation component to change between views
@@ -64,41 +68,19 @@
 
 // People component list people in state
       class People extends React.Component {
-        constructor () {
-          super()
-          this.state = {
-            people: [{
-              "name": "Obi-Wan Kenobi",
-            }],
-            loading: true,
-            hash: 0
-          };
-        };
-        async getPeople() {
-          const reply = await fetch ('https://swapi.co/api/people/')
-          const people = await reply.json()
-          return people
-        };
-        async componentDidMount() {
-          try {
-            const people = await this.getPeople()
-            this.setState({
-              people: people.results,
-              loading: false})
-          } catch (err) {
-            console.error(err)
-          }
+        constructor(props) {
+          super(props)
+          console.log(this.props)
         };
         render () {
-          console.log(this.state)
-          if (this.state.loading) {
+          if (this.props.loading) {
           return <div>Not Loaded</div>;
           }
           return (
             <div id="peopleBox">
               <h3> Galaxy Directory </h3>
                 <ul>
-                  {this.state.people && this.state.people.map((person,idx) => {
+                  {this.props.people && this.props.people.map((person,idx) => {
                      return (
                       <li key={idx} className='person' onClick={() => this.displayPerson(person.url)}>
                         {person.name}
@@ -111,15 +93,18 @@
         };
       };
 
+// Component with form that can add submitted info to state.people
       class CreatePerson extends React.Component {
-
+        render() {
+          <div>
+          </div>
+        }
       }
 
       ReactDOM.render(
           <App/>,
         document.getElementById('root')
-      )
-
+      );
     </script>
     </div>
   </body>
