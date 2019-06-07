@@ -47,6 +47,15 @@
               <Route path='/' component= {NavMenu} />
               <hr />
               <Route path='/people' component= {People} people={this.state.people}/>
+              {/*
+                The issue with not being able to display the people comes from not rendering your component inside the route with props.  It takes a callback, like the below code. Try this out and it will render your people.  Anytime you have a component rendered for a route WITH props, you need to write it this way. Otherwise, the props won't get passed down.
+
+              <Route path='/people' render={() => (
+                  <People
+                    people={this.state.people}
+                  />
+                )}/> 
+                */}
               <Route path='/createPerson' component= {CreatePerson} />
             </HashRouter>
           )
